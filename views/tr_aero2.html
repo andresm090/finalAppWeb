@@ -1,0 +1,344 @@
+</br>
+<div class="row" {% if user.suscripciones.indexOf('aerogenerador/clima') === -1 %} hidden="true" {% endif %}>		
+	<div class="col-md-8 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> <strong>Variables Anemométricas</strong></div>
+			<div class="panel-body">
+				<div class="col-md-6 col-md-offset-0">
+						<div id="containerAnemo" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+						<div id="tableAnemometrica"></div>
+				</div>
+				<div class="col-md-6 col-md-offset-0">
+						<div id="containerWindRose" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+						<div id="tableveleta"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> <strong>Temperatura</strong></div>
+			<div class="panel-body">
+				<div id="containerTermo" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+				<div id="tableTermo"></div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<div class="row" {% if user.suscripciones.indexOf('aerogenerador/energia') === -1 %} hidden="true" {% endif %}>
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-scale" aria-hidden="true"></span> <strong>Energia </strong><input class="pull-right {% if actuador %} buttonFail {% else %} buttonOK {% endif %}" id="btnState" type="radio" checked></input></div>
+			<div class="panel-body">
+				<div class="col-md-7 col-md-offset-0">
+					<div id="containervolyAmp" style="width: 100%; height: 85%; margin: 0 auto"></div>
+					<div id="tableEner"></div>
+				</div>
+				<div class="col-md-5 col-md-offset-0" id="containerPPN">
+					<div id="containerstatebarPN" style="width: 100%; height: 45%; margin: 0 auto;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-5 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> <strong>Banco de Baterias</strong></div>
+			<div class="panel-body">
+				<div id="containerstateVbb" style="min-width: 210px; max-width: 240px; margin: 0 auto"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-7 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> <strong>Especificaciones del Banco de Baterias</strong></div>
+			<div class="panel-body panelBB">
+				<div id="tableBB"></div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<script src="/public/javascripts/bullet.js"></script> <!-- Evaluar-->
+<script>
+
+	// Gauges statebarPN
+	var termometro = Highcharts.chart('containerTermo', {{JSON.stringify(gaugeTemp)}},);
+	var anemometro = Highcharts.chart('containerAnemo', {{JSON.stringify(gaugeVel)}},);
+	var volyAmp = Highcharts.chart('containervolyAmp', {{JSON.stringify(gaugeVA)}},);
+	var windrose = Highcharts.chart('containerWindRose', {{JSON.stringify(gaugeWR)}},);
+	var statebarPN = Highcharts.chart('containerstatebarPN', {{JSON.stringify(statebarPN)}},);
+	var stateVbb = Highcharts.chart('containerstateVbb', {{JSON.stringify(stateVbb)}},);
+	//var arrayDirInv = ["N", "NNW", "NW", "WNW", "W", "WSW", "SW", "SSW", "S", "SSE", "SE", "ESE", "E", "ENE", "NE", "NNE"];
+	var arrayDir = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+	var dirAux = 0;
+	var velAux = 0;
+
+	//var point = statebarPN.series[0].points[0];
+	//point.update(500);
+	// setear de acuerdo a la potenica nominal de cada aerogenerador
+	var point = statebarPN.series[1].points[0];
+	point.update({{potenciaN}});
+
+	{% if actuador %}
+		point = statebarPN;
+		point.update({chart: {type: 'bar', plotBackgroundColor: {
+        	linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        	stops: [
+                [0, 'gray'],
+                [0.1, '#EEEDE4'],
+                [0.5, '#FFFFFF'],
+                [0.9, '#EEEDE4'],
+                [1, 'gray']
+            ],
+    	}}});
+    	$("#containerPPN").addClass("disablePanel");
+	{% endif %}
+
+	//Tablas
+	var tableTemp;
+	var tableAnemo;
+	var tableveleta;
+	var tableEner;
+	var tableBB;
+
+	var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+
+	google.charts.load('current', {'packages':['table']});
+	google.charts.setOnLoadCallback(drawTable);
+	   
+	socket.on('{{socketId}}/c', setData);
+	socket.on('{{socketId}}/p', setDataE);
+	socket.on('{{socketId}}/e', eventFreno);
+
+	function eventFreno(state){
+		pointEvent = statebarPN;
+		if (state == 1){
+			$("#btnState").removeClass("buttonOK");
+			$("#btnState").addClass("buttonFail");
+
+			pointEvent.update({chart: {type: 'bar', plotBackgroundColor: {
+            	linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            	stops: [
+	                [0, 'gray'],
+	                [0.1, '#EEEDE4'],
+	                [0.5, '#FFFFFF'],
+	                [0.9, '#EEEDE4'],
+	                [1, 'gray']
+	            ],
+        	}}});
+
+			$("#containerPPN").addClass("disablePanel");	
+		}
+		if (state == 0){
+			$("#btnState").removeClass("buttonFail");
+			$("#btnState").addClass("buttonOK");
+
+			pointEvent.update({chart: {type: 'bar', plotBackgroundColor: {
+            	linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            	stops: [
+	                [0, '#FFFFFF'],
+                	[0.1, '#FFFFFF'],
+                	[0.5, '#FFFFFF'],
+                	[0.9, '#FFFFFF'],
+                	[1, '#FFFFFF']
+	            ],
+        	}}});
+
+        	$("#containerPPN").removeClass("disablePanel");
+		}
+	}
+	   
+	function pruebaEventoFreno (e){
+		$(e).removeClass("buttonOK");
+		$(e).addClass("buttonFail");
+
+		pointEvent = statebarPN;
+		pointEvent.update({chart: {type: 'bar', plotBackgroundColor: {
+            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            stops: [
+                [0, 'gray'],
+                [0.1, '#EEEDE4'],
+                [0.5, '#FFFFFF'],
+                [0.9, '#EEEDE4'],
+                [1, 'gray']
+            ],
+        }}});
+
+		$("#containerPPN").addClass("disablePanel");
+		alert("Las velocidades de viento exceden la capacidad del equipo, se ha activado el freno electrico");
+
+	}
+
+	function drawTable(){
+
+		var dataTemp = new google.visualization.DataTable();
+		var dataAnemo = new google.visualization.DataTable();
+		var dataVeleta = new google.visualization.DataTable();
+		var dataEner = new google.visualization.DataTable();
+		var dataBB = new google.visualization.DataTable();
+
+		dataTemp.addColumn('number', 'Temperatura');
+		dataTemp.addColumn('string', 'Unidad');
+
+		dataAnemo.addColumn('number', 'Velocidad');
+		dataAnemo.addColumn('string', 'Unidad');
+
+		dataVeleta.addColumn('string', 'Direccion');
+		dataVeleta.addColumn('string', 'Unidad');
+
+		dataEner.addColumn('string', 'Variable');
+		dataEner.addColumn('number', 'Valor');
+		dataEner.addColumn('string', 'Unidad');
+
+		dataBB.addColumn('string', 'Caracteristicas');
+		dataBB.addColumn('string', 'Valor');
+		
+		{% for b in bbaterias %}
+			dataBB.addRows([
+				['{{loop.key}}', '{{b}}']
+			])
+		{% endfor %}
+
+
+		tableTemp = new google.visualization.Table(document.getElementById('tableTermo'));
+		tableAnemo = new google.visualization.Table(document.getElementById('tableAnemometrica'));
+		tableveleta = new google.visualization.Table(document.getElementById('tableveleta'));
+		tableEner = new google.visualization.Table(document.getElementById('tableEner'));
+		tableBB = new google.visualization.Table(document.getElementById('tableBB'));
+	
+		tableTemp.draw(dataTemp, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableAnemo.draw(dataAnemo, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableveleta.draw(dataVeleta, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableEner.draw(dataEner, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableBB.draw(dataBB, {width: '100%', height: '100%', alternatingRowStyle: true});
+
+	}
+
+	function setData(temperatura, velocidad, grad, direccion){
+
+		if (temperatura != null) {
+			var datatemp = new google.visualization.DataTable();
+
+			datatemp.addColumn('number', 'Temperatura');
+			datatemp.addColumn('string', 'Unidad');
+
+			datatemp.addRows([
+				[temperatura, "C°"]
+			]);
+
+			tableTemp.draw(datatemp, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+			var pointTerm = termometro.series[0].points[0];
+			pointTerm.update(temperatura);		
+		}
+
+		if (velocidad != null) {
+			var dataanemo = new google.visualization.DataTable();
+
+			dataanemo.addColumn('number', 'Velocidad');
+			dataanemo.addColumn('string', 'Unidad');
+
+			dataanemo.addRows([
+				[velocidad, "m/s"],
+				[Math.round(velocidad * 3.6), "km/h"]
+			]);
+
+			tableAnemo.draw(dataanemo, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+			var pointAnem = anemometro.series[0];
+
+			pointAnem.update({dataLabels: { formatter: function () {
+		                								var ms = velocidad,
+		                    								kmh = Math.round(ms * 3.6);
+		                								return '<span style="color:#339">' + ms + ' m/s</span><br/>' +
+		                    									'<span style="color:#933">' + kmh + ' Km/h</span>';
+		            								}
+		                  				}
+		              	});
+		
+			pointAnem.points[0].update(velocidad);
+			velAux = velocidad;
+			var pointWR = windrose.series[0].points[dirAux];
+			pointWR.update(velocidad);
+
+		}
+
+		if (grad != null) {
+
+			var dataveleta = new google.visualization.DataTable();
+
+			dataveleta.addColumn('string', 'Direccion');
+			dataveleta.addColumn('string', 'Unidad');
+
+			dataveleta.addRows([
+				[grad.toString(), "grados"],
+				[direccion, "sector"]
+			]);
+
+			tableveleta.draw(dataveleta, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+			var pointWRReset = windrose.series[0].points[dirAux];
+			var pointWR = windrose.series[0].points[arrayDir.indexOf(direccion)];
+			pointWRReset.update(0);
+			pointWR.update(velAux);
+			dirAux = arrayDir.indexOf(direccion);
+
+		}
+	}
+
+	function setDataE(tension, corriente, potenciaG) {
+
+		var dataEner = new google.visualization.DataTable();
+
+		dataEner.addColumn('string', 'Variable');
+		dataEner.addColumn('number', 'Valor');
+		dataEner.addColumn('string', 'Unidad');
+
+		// probar getColumnLabel(columnIndex);
+		//V-A-W
+		//var data = msj.split("-");
+		//var tension = Number(data[0]);
+		//var corriente = Number(data[1]);
+		//var potenciaG = Number(data[2]);
+
+		dataEner.addRows([
+			["Tensión", tension, "V"],
+			["Amperaje", corriente, "Amp"],
+			["Consumo", (tension*corriente), "Watt"]
+		]);
+
+		tableEner.draw(dataEner, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+			
+		var pointV = volyAmp.series[0].points[0];
+		var pointA = volyAmp.series[1].points[0];
+
+		pointV.update(tension, false);
+		pointA.update(corriente, false);
+		volyAmp.redraw();
+
+		var pointBarPN = statebarPN.series[0].points[0];
+		pointBarPN.update(potenciaG);
+
+		var vtbb = Number({{bbaterias['voltaje total']}});
+		var pointVbb = stateVbb.series[0];
+		var labelPiboteBb = '<span style="visibility: hidden;">..</span>';
+        var labelCuerpoBb = '<span style="font-size:30px; text-align:center; width:30px">{point.x}</span><br><span style="visibility: hidden;">-</span><span style="font-size:12px; color:#888888; font-weight: bold; text-indent:60px;">{series.name}</span><br><span style="font-size:12px; color:#888888; font-weight: bold text-indent:60px;">------</span><br><span style="font-size:22px; color:#888888; font-weight: bold">{point.y}%</span>';
+
+		if(tension>9){
+        	pointVbb.update({dataLabels: { format: labelCuerpoBb}});
+		} else {
+			pointVbb.update({dataLabels: { format: labelPiboteBb + labelCuerpoBb}});
+		}
+
+		pointVbb = stateVbb.series[0].points[0];
+        pointVbb.update(Math.round(tension*100/vtbb));
+        pointVbb.update({x: Math.round(tension)}); 
+
+	}
+
+</script>

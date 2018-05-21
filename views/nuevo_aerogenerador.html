@@ -1,0 +1,180 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="row content">
+	<div class="col-md-6 col-md-offset-3">
+		 <div class="panel panel-default">
+		 	<div class="panel-heading">Nuevo Aerogenerador</div>
+            <div class="panel-body">
+				<form class="form-horizontal" method="post">
+
+				  	<span class="label label-default">Especificaciones tecnicas</span>
+				  	<hr>
+
+					<div class="form-group row">
+						<label class="col-md-4 control-label">Fabricante</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="fabricante" name ="fabricante" class="form-control">
+        							<option>Enercon</option>
+        							<option>Eveready Diversified</option>
+        							<option>Layer Electronics s.r.l.</option>
+        							<option>Eolocal</option>
+        							<option>Neg Micon</option>
+        							<option>Gamesa</option>
+        							<option>Ecotecnia</option>
+        							<option>Izar-Bonus</option>
+        							<option>Made AE</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Modelo - Serie</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="modelo" name="modelo" placeholder="Modelo o Serie del equipo" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Potencia Nominal</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="pn" name="pn" placeholder="Potencia nominal (Watt)" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Diametro del rotor</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="diametro" name="diametro" placeholder="Diametro del rotor (mts)" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Altura de la torre</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="h" name="h" placeholder="Altura de la torre (mts)" min="1" >
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Velocidad de arranque</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="velm" name="velm" placeholder="velocidad de arranque (mts)" min="1">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Velocidad de parada</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="velp" name="velp" placeholder="velocidad de parada (mts)" min="1">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Número de palas</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="npalas" name="npalas" placeholder="Numero de palas" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Generación</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="generacion" name="generacion" class="form-control">
+        							<option>Asincrona</option>
+        							<option>Sincrona</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+				  	</br>
+				  	<span class="label label-default">Especificación del banco de baterias</span>
+				  	<hr>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Voltaje (Volt)</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="vol" name="vol" placeholder="voltaje" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Capacidad (Ah)</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Cant. de baterias</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="nbaterias" name="nbaterias" placeholder="Cantidad de baterias" min="1" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Tipo de conexión</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="conexion" name="conexion" class="form-control">
+        							<option>Serie</option>
+        							<option>Paralelo</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+					<div class="form-group">
+                  		<div class="col-md-6 col-md-offset-4">
+                    		<button type="submit" class="btn btn-primary">
+                        		<i class="fa fa-btn fa-sign-in"></i> Registrar Nuevo Dispositivo
+                        	</button>
+                    	</div>
+                	</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+<!-- http://www.directindustry.es/fabricante-industrial/aerogenerador-baja-potencia-87253.html -->

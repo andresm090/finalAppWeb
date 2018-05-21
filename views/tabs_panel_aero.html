@@ -1,0 +1,26 @@
+	<ul class="nav nav-tabs">
+		<li role="presentation" class="active"><a href="#">Carac. Tecnicas</a></li>
+		<li role="presentation"><a onclick="getDataTR()">Tiempo Real</a></li>
+		<li role="presentation"><a href="#">Historicos</a></li>
+		<li role="presentation"><a href="#">Equipos</a></li>
+	</ul>
+	<div id="data"> </div>
+
+<script>
+
+	function getDataTR(){
+		$.ajax({
+  		url: "/getDataTR",
+  		type: "GET",
+  		success: function(data) {
+  				$("#data").replaceWith(data);
+  			}
+  		});
+
+	}
+
+	function mostrarTabPanel(){
+		alert("Tab del Panel");
+	}
+
+</script>

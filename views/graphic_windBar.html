@@ -1,0 +1,31 @@
+{% extends 'graphic_base.html' %}
+
+{% block content %}
+	<script>
+		var grafico1 = Highcharts.chart('{{conf['id']}}', {{JSON.stringify(conf['grafico'])}},);
+		point = grafico1.title;
+		point.update({text: '{{conf['titulo']}}'});
+		point = grafico1.series[0];
+		point.update({data: [
+			{% for d in datos %}
+				[Date.UTC({{d['anio']}}, {{d['mes']}}, {{d['dia']}}, {{d['hora']}}, {{d['min']}}, {{d['seg']}}), {{d['vel']}}, {{d['dir']}}],
+			{% endfor %}
+			],
+			//pointStart: Date.UTC({{fecha.getFullYear()}}, {{fecha.getUTCMonth()}}, {{fecha.getUTCDate()}}),
+		});
+
+		point = grafico1.series[1];
+
+		point.update({data: [
+			{% for d in datos %}
+				[Date.UTC({{d['anio']}}, {{d['mes']}}, {{d['dia']}}, {{d['hora']}}, {{d['min']}}, {{d['seg']}}), {{d['vel']}}, {{d['dir']}}],
+			{% endfor %}
+			],
+			//pointStart: Date.UTC({{fecha.getFullYear()}}, {{fecha.getUTCMonth()}}, {{fecha.getUTCDate()}}),
+		});
+
+
+
+	</script>	
+
+{% endblock %}

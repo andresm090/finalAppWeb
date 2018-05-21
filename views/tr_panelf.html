@@ -1,0 +1,276 @@
+</br>
+<style type="text/css">
+	.highcharts-yaxis-grid {
+		display: none;}
+	.highcharts-grid-line {
+		display: :none;
+	}
+	.custom{
+  		margin-top: 5.5%;
+  		margin-bottom: 5.5%;
+	}	
+</style>
+<div class="row" {% if user.suscripciones.indexOf('fotovoltaica/clima') === -1 %} hidden="true" {% endif %}>		
+	<div class="col-md-8 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span> <strong>Variables Atmosfericas</strong></div>
+			<div class="panel-body">
+				<div class="col-md-6 col-md-offset-0">
+						<div id="containerPiranometro" style="width: 300px; height: 260px; float: left"></div>
+						<div id="tableAtmosfericas"></div>
+				</div>
+				<div class="col-md-6 col-md-offset-0">
+						<div id="containerInc" style="min-width: 107%; max-width: 107%; height: 260px; margin: 0 auto"></div>
+						<div id="tableInclinacion"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-4 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> <strong>Temperatura</strong></div>
+			<div class="panel-body">
+				<div id="containerTermo" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+				<div id="tableTermo"></div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<div class="row" {% if user.suscripciones.indexOf('fotovoltaica/energia') === -1 %} hidden="true" {% endif %}>
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-scale" aria-hidden="true"></span> <strong>Energia</strong></div>
+			<div class="panel-body">
+				<div class="col-md-7 col-md-offset-0">
+					<div id="containervolyAmp" style="width: 100%; height: 85%; margin: 0 auto"></div>
+					<div id="tableEner"></div>
+				</div>
+				<div class="col-md-5 col-md-offset-0">
+					<div id="containerstatebarPN" style="width: 100%; height: 45%; margin: 0 auto"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-5 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> <strong>Banco de Baterias</strong></div>
+			<div class="panel-body">
+				<div id="containerstateVbb" style="min-width: 210px; max-width: 240px; margin: 0 auto"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-7 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> <strong>Especificaciones del Banco de Baterias</strong></div>
+			<div class="panel-body custom">
+				<div id="tableBB"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="/public/javascripts/bullet.js"></script> <!-- Evaluar-->
+<script>
+
+	// Gauges statebarPN
+	var termometro = Highcharts.chart('containerTermo', {{JSON.stringify(gaugeTemp)}},);
+	var piranometro = Highcharts.chart('containerPiranometro', {{JSON.stringify(gaugePira)}},);
+	var volyAmp = Highcharts.chart('containervolyAmp', {{JSON.stringify(gaugeVA)}},);
+	var statebarPN = Highcharts.chart('containerstatebarPN', {{JSON.stringify(statebarPN)}},);
+	var inclinometro = Highcharts.chart('containerInc', {{JSON.stringify(gaugeInc)}},);
+	var stateVbb = Highcharts.chart('containerstateVbb', {{JSON.stringify(stateVbb)}},);
+	
+	// setear de acuerdo a la potenica nominal de cada aerogenerador
+
+	var point = statebarPN.series[1].points[0];
+	point.update({{potenciaN}});
+
+	point = statebarPN.title;
+	point.update({text: 'Potencia del Panel Fotovoltaico'});
+
+	point = statebarPN.xAxis[0];
+	point.update({categories: ['1'],
+        title: {
+            text: 'N° Panel Fotovoltaico'
+        }});  
+	
+	//Tablas
+	var tableTemp;
+	var tableAtmo;
+	var tableEner;
+	var tableBB;
+	var tableInc;
+
+	var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+
+	google.charts.load('current', {'packages':['table']});
+	google.charts.setOnLoadCallback(drawTable);
+	   
+	socket.on('{{socketId}}/c', setDataC);
+	socket.on('{{socketId}}/p', setDataE);
+	socket.on('{{socketId}}/e', setDataEvent);
+	   
+	function setDataEvent(data, inc){
+
+		var dataInc = new google.visualization.DataTable();
+
+		dataInc.addColumn('number', 'Inclinación del panel');
+		dataInc.addColumn('string', 'Unidad');
+
+		dataInc.addRows([
+			[inc, "grados"]
+		]);
+
+		tableInc.draw(dataInc, {width: '100%', height: '100%', alternatingRowStyle: true});
+
+		var pointInc = inclinometro;
+		pointInc.update({series: data});
+	}
+
+	function drawTable(){
+
+		var dataTemp = new google.visualization.DataTable();
+		var dataAtmos = new google.visualization.DataTable();
+		var dataEner = new google.visualization.DataTable();
+		var dataBB = new google.visualization.DataTable();
+		var dataInc = new google.visualization.DataTable();
+
+		dataTemp.addColumn('number', 'Temperatura');
+		dataTemp.addColumn('string', 'Unidad');
+
+		dataAtmos.addColumn('number', 'Radiación Solar');
+		dataAtmos.addColumn('string', 'Unidad');
+
+		dataInc.addColumn('number', 'Inclinación del panel');
+		dataInc.addColumn('string', 'Unidad');
+
+		dataInc.addRows([
+			[{{value}}, "grados"]
+		]);
+
+		dataEner.addColumn('string', 'Variable');
+		dataEner.addColumn('number', 'Valor');
+		dataEner.addColumn('string', 'Unidad');
+
+		dataBB.addColumn('string', 'Caracteristicas');
+		dataBB.addColumn('string', 'Valor');
+		
+		{% for b in bbaterias %}
+			dataBB.addRows([
+				['{{loop.key}}', '{{b}}']
+			])
+		{% endfor %}
+
+
+		tableTemp = new google.visualization.Table(document.getElementById('tableTermo'));
+		tableAtmo = new google.visualization.Table(document.getElementById('tableAtmosfericas'));
+		tableEner = new google.visualization.Table(document.getElementById('tableEner'));
+		tableBB = new google.visualization.Table(document.getElementById('tableBB'));
+		tableInc = new google.visualization.Table(document.getElementById('tableInclinacion'));
+	
+		tableTemp.draw(dataTemp, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableAtmo.draw(dataAtmos, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableEner.draw(dataEner, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+		tableBB.draw(dataBB, {width: '100%', height: '100%', alternatingRowStyle: true});
+		tableInc.draw(dataInc, {width: '100%', height: '100%', alternatingRowStyle: true});
+
+		// colocar en metodo de manejo de evento
+		var pointInc = inclinometro;
+		pointInc.update({series: {{JSON.stringify(data)}}});
+
+	}
+
+
+	function setDataC(temperatura, radiacion){
+
+		if (temperatura != null) {
+
+			var datatemp = new google.visualization.DataTable();
+			datatemp.addColumn('number', 'Temperatura');
+			datatemp.addColumn('string', 'Unidad');
+
+			datatemp.addRows([
+				[temperatura, "C°"]
+			]);
+
+			tableTemp.draw(datatemp, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+			var pointTerm = termometro.series[0].points[0];
+			
+			pointTerm.update(temperatura);
+
+		}
+
+		if (radiacion != null) {
+
+			var dataAtmos = new google.visualization.DataTable();
+
+			dataAtmos.addColumn('number', 'Radiación Solar');
+			dataAtmos.addColumn('string', 'Unidad');
+
+			dataAtmos.addRows([
+				[radiacion, "w/m²"]
+			]);
+
+			tableAtmo.draw(dataAtmos, {showRowNumber: true, width: '100%', height: '100%'});
+
+			var pointAtmo = piranometro.series[0].points[0];
+			
+			pointAtmo.update(radiacion);
+		}
+	}
+
+	function setDataE(tension, corriente, potenciaG) {
+
+		var dataEner = new google.visualization.DataTable();
+
+		dataEner.addColumn('string', 'Variable');
+		dataEner.addColumn('number', 'Valor');
+		dataEner.addColumn('string', 'Unidad');
+
+		//V-A-W
+		//var data = msj.split("-");
+		//var tension = Number(data[0]);
+		//var corriente = Number(data[1]);
+		//var potenciaG = Number(data[2]);
+
+		dataEner.addRows([
+			["Tensión", tension, "V"],
+			["Amperaje", corriente, "Amp"],
+			["Consumo", (tension*corriente), "Watt"]
+		]);
+
+		tableEner.draw(dataEner, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+			
+		var pointV = volyAmp.series[0].points[0];
+		var pointA = volyAmp.series[1].points[0];
+
+		pointV.update(tension, false);
+		pointA.update(corriente, false);
+		volyAmp.redraw();
+
+		var pointBarPN = statebarPN.series[0].points[0];
+		pointBarPN.update(potenciaG);
+
+		var vtbb = Number({{bbaterias['voltaje total']}});
+		var pointVbb = stateVbb.series[0];
+		var labelPiboteBb = '<span style="visibility: hidden;">..</span>';
+        var labelCuerpoBb = '<span style="font-size:30px; text-align:center; width:30px">{point.x}</span><br><span style="visibility: hidden;">-</span><span style="font-size:12px; color:#888888; font-weight: bold; text-indent:60px;">{series.name}</span><br><span style="font-size:12px; color:#888888; font-weight: bold text-indent:60px;">------</span><br><span style="font-size:22px; color:#888888; font-weight: bold">{point.y}%</span>';
+
+		if(tension>9){
+        	pointVbb.update({dataLabels: { format: labelCuerpoBb}});
+		} else {
+			pointVbb.update({dataLabels: { format: labelPiboteBb + labelCuerpoBb}});
+		}
+
+		pointVbb = stateVbb.series[0].points[0];
+        pointVbb.update(Math.round(tension*100/vtbb));
+        pointVbb.update({x: Math.round(tension)});   
+
+	}
+
+</script>

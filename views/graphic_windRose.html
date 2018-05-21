@@ -1,0 +1,43 @@
+{% extends 'graphic_base.html' %}
+
+{% block content %}
+	<div style="display:none">
+		<table id="freq2" border="0" cellspacing="0" cellpadding="0">
+        	<tr nowrap bgcolor="#CCCCFF">
+            	<th colspan="9" class="hdr">Table of Frequencies (percent)</th>
+        	</tr>
+
+	        <tr nowrap bgcolor="#CCCCFF">
+	            <th class="freq">Direccion</th>
+	            <th class="freq">&lt; 0.5 m/s</th>
+	            <th class="freq">0.5-2 m/s</th>
+	            <th class="freq">2-4 m/s</th>
+	            <th class="freq">4-6 m/s</th>
+	            <th class="freq">6-8 m/s</th>
+	            <th class="freq">8-10 m/s</th>
+	            <th class="freq">&gt; 10 m/s</th>
+	        </tr>
+
+	        {% for data in datos %}
+
+	        	<tr nowrap>
+		            <td class="dir">{{loop.key}}</td>
+		            {% for val in data %}
+		            	<td class="data">{{val}}</td>
+		            {% endfor %}
+		        </tr>
+	        {% endfor %}
+	    </table>
+
+	</div>
+
+	<script>
+		$(document).ready(function() {
+			var grafico1 = Highcharts.chart('{{conf['id']}}', {{JSON.stringify(conf['grafico'])}},);
+			point = grafico1.title;
+			point.update({text: '{{conf['titulo']}}'});
+		});
+		
+	</script>		
+
+{% endblock %}

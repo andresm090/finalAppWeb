@@ -1,0 +1,38 @@
+
+{% extends 'graphic_base.html' %}
+
+{% block content %}
+	<script>
+
+		google.charts.load('current', {'packages':['table']});
+		google.charts.setOnLoadCallback(drawTableEvent);
+
+		function drawTableEvent(){
+
+			var dataEvent = new google.visualization.DataTable();
+
+			dataEvent.addColumn('string', 'Evento');
+			dataEvent.addColumn('string', 'Producido');
+			
+			{% for evento in datos %}
+				dataEvent.addRows([
+					{% if evento.topico.indexOf("Ei") > -1 %}
+						['Ajuste de inclinación del panel - {{evento.valor}}°', '{{evento.producedAt.toLocaleString('en-us', options)}}']
+					{% else %}
+						{% if evento.valor == 1 %}
+							['Freno de corriente parasitas activado', '{{evento.producedAt.toLocaleString('en-us', options)}}']
+						{% else%}
+							['Freno de corriente parasitas desacoplado', '{{evento.producedAt.toLocaleString('en-us', options)}}']
+						{% endif %}	
+					{% endif %}
+				])
+			{% endfor %}
+
+			tableEvent = new google.visualization.Table(document.getElementById('{{conf['id']}}'));
+			tableEvent.draw(dataEvent, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+		}
+
+	</script>	
+
+{% endblock %}

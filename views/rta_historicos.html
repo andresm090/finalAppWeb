@@ -1,0 +1,68 @@
+<script src="https://code.highcharts.com/modules/windbarb.js"></script>
+
+{% for grafico in graficos %}
+<div class="row">		
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel {{grafico['panel']}}">
+			<div class="panel-heading">{{grafico['titulo']}} <a class="pull-right glyphicon glyphicon-triangle-bottom" data-toggle="collapse" href="#{{grafico['collapse']}}"></a></div>
+			<div id="{{grafico['collapse']}}" class="panel-collapse collapse in">
+				<div class="panel-body">
+					<div class="col-md-12 col-md-offset-0">
+						<div id="{{grafico['id']}}" style="min-width: 300px; max-width: 800px; height: 300px; margin: 0 auto"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	var grafico1 = Highcharts.chart('{{grafico['id']}}', {{JSON.stringify(grafico['grafico'])}},);
+	point = grafico1.title;
+	point.update({text: '{{grafico['titulo']}}'});
+	point = grafico1.yAxis[0];
+	point.update({title: { text: '{{grafico['unidad']}}'}});
+	//point = grafico1.plotOptions;
+	//point.update({ series: { pointStart: {{fecha}}, pointInterval: 36e5}});
+	point = grafico1.series[0];
+	point.update({data: [
+		{% for v in valores %}
+			{% if v.tipo == grafico['tipo'] %}
+				[{{v.valor}}, Date.UTC({{v.producedAt.getFullYear()}}, {{v.producedAt.getMonth()}}, {{v.producedAt.getDate()}}, {{v.producedAt.getHours()}}, {{v.producedAt.getMinutes()}}, {{v.producedAt.getSeconds()}})],
+			{% endif %}
+		{% endfor %}
+		],
+		//pointStart: Date.UTC({{fecha.getFullYear()}}, {{fecha.getUTCMonth()}}, {{fecha.getUTCDate()}}),
+		//pointInterval: {{media}},
+		name: '{{grafico['titulo']}}',
+		tooltip: {
+            valueSuffix: ' {{grafico['unidad']}}'
+        },
+	});
+
+
+</script>
+
+{% endfor %}
+
+<table class="table table-bordered table-striped">
+			<thead class="inverse">
+			    <tr>
+					<th class="text-center">#</th>
+					<th class="text-center">Datos</th>
+					<th class="text-center">Tipo</th>
+					<th class="text-center">Fecha</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for v in valores %}
+					<tr>
+						<th class="text-center" scope="row">{{loop.index}}</th>
+						<td class="text-center">{{v.valor}}</td>
+						<td class="text-center">{{v.tipo}}</td>
+						<td class="text-center">{{v.producedAt.toLocaleString()}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>	

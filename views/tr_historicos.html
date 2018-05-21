@@ -1,0 +1,226 @@
+</br>
+<script src="/public/javascripts/windbarb.js"></script>
+<script src="/public/javascripts/data.js"></script>
+<div class="row">		
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Datos Relevados - Históricos  <a class="pull-right glyphicon glyphicon-triangle-bottom" data-toggle="collapse" href="#collapse1"></a></h3>
+			</div>
+			<div id="collapse1" class="panel-collapse collapse in">
+				<div class="panel-body">
+
+					<div class="col-md-12 col-md-offset-0">
+						<div class="panel-heading clearfix"><strong>Periodo de muestreo</strong><hr></div>
+						<form class="form-inline" id="formH" method="post">
+							<div class="col-md-4">
+								<input type="text" id="tipo" name="tipo" hidden="true">
+								<div {% if user.suscripciones.indexOf(clima) === -1 %} hidden="true" {% endif %}>
+									<h5><strong>Variables climaticas</strong></h5> 
+									<label class="checkbox-inline">
+		  								<input type="checkbox" id="temp" name="temp"> Temperatura
+									</label>
+									{% if datos == 0 %}
+				  						<label class="checkbox-inline">
+			  								<input type="checkbox" id="vel" name="vel"> Vel. Viento
+										</label>
+				  						<label class="checkbox-inline">
+			  								<input type="checkbox" id="dir" name="dir"> Dir. Viento
+										</label>
+									{% else %}
+										<label class="checkbox-inline">
+			  								<input type="checkbox" id="rad" name="rad"> Radiación solar
+										</label>
+									{% endif %}
+									<hr>
+								</div>
+								<div {% if user.suscripciones.indexOf(energia) === -1 %} hidden="true" {% endif %}>
+									<h5><strong>Variables Energia</strong></h5> 
+									<label class="checkbox-inline">
+		  								<input type="checkbox" id="pg" name="pg"> Potencia Generada
+									</label>
+			  						<label class="checkbox-inline">
+		  								<input type="checkbox" id="pc" name="pc"> Potencia Consumida
+									</label>
+									<hr>
+								</div>
+								<div {% if user.suscripciones.indexOf(clima) === -1 && datos != 0 %} hidden="true" {% else %} {% if user.suscripciones.indexOf(energia) === -1 && datos == 0 %} hidden="true" {% endif %}>
+									<h5><strong>Registro de eventos</strong></h5> 
+									<label class="checkbox-inline">
+		  								<input type="checkbox" id="event" name="event"> Eventos ocurridos durante
+									</label>
+								</div>
+							</div>
+							<div class="col-md-8">
+								<div class="col-md-12">
+									<div class="form-group">
+										<label for="fechaI" class="control-label">Inicio</label>
+											<input type="date" class="form-control" id="fechaI" name="fechaI">
+				  					</div>
+				  					<div class="form-group">
+										<label for="fechaF" class="control-label" >Final</label>
+											<input type="date" class="form-control" id="fechaF" name="fechaF">
+				  					</div>
+				  					<div class="form-group">
+										<label for="media" class="control-label">Medias</label>
+											<select id="media" name="media" class="form-control">
+			        							<option value="0">30 segundos</option>
+			        							<option value="1">10 minutales</option>
+			      							</select>
+				  					</div>
+				  				</div>
+				  				<hr>
+			  					<div class="col-md-12 col-md-offset-3">
+		  							<div class="form-group">
+	                  					<div class="col-md-6 col-md-offset-4 vertical-offset">
+	                    					<button type="button" id="submit" class="btn btn-primary" onclick="sendForm()">
+	                        					<i class="fa fa-btn fa-sign-in"></i> Mostrar
+	                        				</button>
+	                    				</div>
+	                				</div>
+		  						</div>
+		  					</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!--<div id="historicos"> -->
+<div id="gratemp"></div>
+<div id="gravel"></div>
+<div id="gradir"></div>
+<div id="graveldir"></div>
+<div id="grarad"></div>
+<div id="grapg"></div>
+<div id="grapc"></div>
+<div id="tableEvent"></div>
+<script>
+	
+function sendForm() {
+
+	if ($('#temp').is(':checked')) {
+		$('#tipo').val("T");
+		$.ajax({
+			url: "/getGrapArea/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#gratemp").html(data);
+		  	}
+	  	});
+	} else {
+		$("#gratemp").empty();
+	}
+
+	if ($('#vel').is(':checked') && $('#dir').is(':checked')) {
+		$.ajax({
+			url: "/getGrapWIndBar/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#graveldir").html(data);
+		  	}
+	  	});
+	  	$("#gravel").empty();
+	  	$("#gradir").empty();
+	} else {
+		$("#graveldir").empty();
+		$("#gradir").empty();
+		if ($('#vel').is(':checked')) {
+			$('#tipo').val("Vm");
+			$.ajax({
+				url: "/getGrapArea/" + '{{id}}',
+			  	type: "POST",
+			  	data: $('#formH').serialize(), 
+			  	success: function(data) {
+			  		$("#gravel").html(data);
+			  	}
+		  	});
+
+		} else {
+			$("#gravel").empty();
+			if ($('#dir').is(':checked')) {
+				$.ajax({
+					url: "/getWindRose/" + '{{id}}',
+				  	type: "POST",
+				  	data: $('#formH').serialize(), 
+				  	success: function(data) {
+				  		$("#gradir").html(data);
+				  	}
+			  	});
+			} else {
+				$("#gradir").empty();
+			} 
+		}
+	}
+
+	if ($('#rad').is(':checked')) {
+		$('#tipo').val("Rs");
+		$.ajax({
+			url: "/getGrapArea/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#grarad").html(data);
+		  	}
+	  	});
+	} else {
+		$("#grarad").empty();
+	}
+
+	if ($('#pg').is(':checked')) {
+		$('#tipo').val("Pg");
+		$.ajax({
+			url: "/getGrapLine/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#grapg").html(data);
+		  	}
+	  	});
+	} else {
+		$("#grapg").empty();
+	}
+
+	if ($('#pc').is(':checked')) {
+		$('#tipo').val("Ac");
+		$.ajax({
+			url: "/getGrapLine/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#grapc").html(data);
+		  	}
+	  	});
+	} else {
+		$("#grapc").empty();
+	}
+
+	if ($('#event').is(':checked')) {
+
+		$.ajax({
+			url: "/getRegEvent/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#tableEvent").html(data);
+		  	}
+	  	});
+	} else {
+		$("#tableEvent").empty();
+	}
+
+	/*$.ajax({
+			url: "/getHistoricos/" + '{{id}}',
+		  	type: "POST",
+		  	data: $('#formH').serialize(), 
+		  	success: function(data) {
+		  		$("#historicos").html(data);
+		  	}
+	  	});*/
+
+}
+
+</script>

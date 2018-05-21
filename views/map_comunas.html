@@ -1,0 +1,251 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<script src="http://localhost:3300/socket.io/socket.io.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
+<script src="/public/javascripts/gmaps.js"></script>
+<style type="text/css">
+    #map {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
+<script>
+
+	var map;
+	var makers = [];
+	var generadores = [];
+	var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+
+	$(document).ready(function(){
+
+		map = new GMaps({
+			div: '#map',
+			zoom: 6,
+			lat: -42,
+			lng: -71
+		});
+
+		{% for comuna in comunas %}
+
+			var m = map.addMarker({
+				lat: {{comuna.point_geom[0]['latitud']}},
+				lng: {{comuna.point_geom[0]['longitud']}},
+				title: '{{comuna.nombre}}',
+				icon: '/public/images/boton_verde.png',
+				id: '{{comuna.id}}',
+				click: function (e){
+					//$('#encabezado').empty();
+					//$('#encabezado').append('{{comuna.nombre}}');
+					$('#encabezado').html('{{comuna.nombre}}');
+					$('#latitud').html('{{comuna.point_geom[0]['latitud']}}');
+					$('#longitud').html('{{comuna.point_geom[0]['longitud']}}');
+					$('#local').html('{{comuna.localidad}}');
+					$('#dep').html('{{comuna.departamento}}');
+					$('#habitantes').html('{{comuna.poblacion}}');
+					$('#encargado').html('{{comuna.encargado}}');
+					$.ajax({
+	  					url: "/comunas/{{comuna.id}}/getGeneradores",
+	  					type: "GET",
+	  					data: {},
+	  					success: function(data) {
+	  						$('#tableG').html(data);
+	  						for (i = 0; i < generadores.length; i++){
+		  						$(generadores[i]).removeClass("btn-success");
+		  						$(generadores[i]).addClass("btn-warning");
+		  						$(generadores[i]).attr('title', 'Ver Dashboard (El panel se ha ajustado recientemente)');
+		  						$(generadores[i]+'row').html("<span class=\"glyphicon glyphicon-info-sign\" aria-hidden=\"true\"></span>");
+		  					}
+	  					}
+  					});
+  					$.ajax({
+	  					url: "/comunas/{{comuna.id}}/getEventos",
+	  					type: "GET",
+	  					data: {},
+	  					success: function(data) {
+	  						$('#tableE').html(data);
+	  					}
+  					});
+					$('#modal').modal('show');
+					//$('#nombre').replaceWith('{{comuna.nombre}}');
+				},
+			});
+			makers.push(m);
+		{% endfor %}
+		{% if user.suscripciones.indexOf('aerogenerador/energia') !== -1 %}
+			{% for comuna in comunas %}
+
+				$.ajax({
+					url: "/comunas/{{comuna.id}}/getEstadoGenerador",
+					type: "GET",
+					data: {},
+					success: function(activado) {
+						for (i = 0; i < makers.length; i++){
+							if ('{{comuna.id}}' == makers[i].id){
+								var e = makers[i];
+								if (activado) {
+									e.icon = '/public/images/boton_rojo.png';
+									map.removeMarker(makers[i]);
+									map.addMarker(e);
+								}
+							}
+						}		
+					}
+				});
+			{% endfor %}
+		{% endif %}
+	});
+
+	function verDatos(id){
+		location.href = "/generador/" + id;
+	};
+
+	function prueba() {
+		/*var e = makers[0];
+		e.icon = '/public/images/boton_rojo.png';
+		map.removeMarker(makers[0]);
+		map.addMarker(e);
+		alert(e.id);*/
+	}
+
+	{% if user.suscripciones.indexOf('aerogenerador/energia') !== -1 %}
+
+		socket.on('mapComuna/e', eventFreno);
+
+		function eventFreno(state, id){
+			
+			for (i = 0; i < makers.length; i++){
+				if (id == makers[i].id){
+					var e = makers[i];
+					if (state == 1) {
+						e.icon = '/public/images/boton_rojo.png';
+					}
+					if (state == 0) {
+						e.icon = '/public/images/boton_verde.png';
+					}
+					map.removeMarker(makers[i]);
+					map.addMarker(e);
+
+				}
+			}		
+		}
+
+	{% endif %}
+
+	{% if user.suscripciones.indexOf('fotovoltaica/clima') !== -1 %}
+
+		//var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+		socket.on('mapComuna/i', eventInclinacion);
+
+		function eventInclinacion(idcomuna, idgenerador){
+			
+			for (i = 0; i < makers.length; i++){
+				if (idcomuna == makers[i].id){
+					var e = makers[i];
+					e.icon = '/public/images/boton_amarillo.png';
+					map.removeMarker(makers[i]);
+					map.addMarker(e);
+					generadores.push('#'+idgenerador);
+				}
+			}		
+		}
+
+	{% endif %}
+
+</script>
+
+<div class="row content">
+	<div class="col-md-12">
+		 <div class="panel panel-default">
+		 	<div class="panel-heading">Mapa de Comunas</div>
+            <div class="panel-body">
+				 <div id="map"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Ventana Modal de muestreo de datos -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        		<h4 class="modal-title" id="encabezado"></h4>
+      		</div>
+	      	<div class="modal-body">
+	      		<div class="panel panel-default">	
+	      			<div class="panel-heading">Información</div>	
+					<div class="panel-body">
+	      				<div class="col-md-4">
+	      					<div class="panel panel-default">
+	      						<div class="panel-heading"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> <strong>Datos Generales</strong></div>
+	      						<div class="panel-body">
+		      							
+						        	<ul>
+						        	 	<li>
+						        		<strong> Latitud: </strong>
+						        		<span id="latitud"></span>
+						        		</li>
+						        		<li>
+						        		<strong> Longitud: </strong>
+						        		<span id="longitud"></span>
+						        		</li>
+						        		<li>
+						        		<strong> Localidad: </strong>
+						        		<span id="local"></span>
+						        		</li>
+						        		<li>
+						        		<strong> Departamento: </strong>
+						        		<span id="dep"></span>
+						        		</li>
+						        		<li>
+						        		<strong> Cant. de Habiatantes: </strong>
+						        		<span id="habitantes"></span>
+						        		</li>
+						        		<li>
+						        		<strong> Encargado: </strong>
+						        		<span id="encargado"></span>		
+						        		</li>
+						        	</ul>
+						        	<!-- <span class="label label-default"> Latitud:</span>
+						        		<strong id="latitud"></strong><br>
+
+						        		<span class="label label-default"> Longitud: </span>
+						        		<strong id="longitud"></strong><br>
+
+						        		<span class="label label-default"> Localidad: </span>
+						        		<strong id="local"></strong><br>
+
+						        		<span class="label label-default"> Departamento: </span>
+						        		<strong id="dep"></strong><br>
+
+						        		<span class="label label-default"> Cant. de Habiatantes: </span>
+						        		<strong id="habitantes"></strong><br>
+
+						        		<span class="label label-default"> Encargado: </span>
+						        		<strong id="encargado"></strong><br>-->
+						        </div>
+							</div>
+						</div>
+						<div class="col-md-8">
+	      					<div id="tableE"> </div>
+						</div>
+						<div class="col-md-12">
+							<div class="panel panel-default">
+								<div class="panel-heading"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> <strong>Equipos de generación instalados</strong></div>
+								<!-- Table -->
+								<div id="tableG"> </div>
+							</div>
+						</div>
+		      		</div>
+		      	</div>
+			</div>
+	    	<div class="modal-footer">
+	        	<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+	      	</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

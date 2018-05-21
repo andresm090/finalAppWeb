@@ -1,0 +1,132 @@
+</br>
+<div class="row">
+
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> <strong>Informacion</strong></div>
+			<div class="panel-body">
+				<h3>Leer detenidamente:</h3>
+				<p>Los datos relevados, correspondientes a los sensores listados en la tabla de la izquierda, son <mark><ins>re-publicados</ins></mark> en los topicos especificados. Los mismos se encuentran procesados y preparados para su visualización en cualquier Dashboad deseado. Tener en cuenta que los datos publicados son en tiempo real y se publican cada vez que las placas envian nuevos valores. La excursión de los datos dependeran de las caracteristicas tecnicas del equipo a trabajar, las mismas pueden ser consultadas en la pestaña de <mark><ins>"Carac. Tecnicas"</ins></mark>.
+				Para recibir los datos de conexion y credenciales correspondientes, verifique su cuenta de corre electronico en el formulario que se encuentra a la derecha y haga click en el boton de <mark><ins>"Solicitar Acceso"</ins></mark>. En breve recibira un mail con la información necesaria para conectarse y configurar su dashboard.  
+				</p>
+			</div>
+			
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-scale" aria-hidden="true"></span><strong> Sensores y Suscripciones</strong></div>
+			<div class="panel-body">
+				<table class="table table-bordered">
+					<thead class="inverse">
+	    				<tr>
+							<th class="text-center info">Sensores Climaticos</th>
+							<th class="text-center info">Unidad</th>
+							<th class="text-center info">Publicacion en Topico</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+						{% for c in generador.sensoresC %}
+							{% if c['re_publica'] %}
+								<tr>
+									<th class="text-center">{{c['nombre']}}</th>
+									<td class="text-center">{{c['unidad']}}</td>
+									<td class="text-center">{{"C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+c['topico']}}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+						<tr>
+							<th class="text-center warning">Sensores Electricos</th>
+							<th class="text-center warning">Unidad</th>
+							<th class="text-center warning">Publicacion en Topico</th>
+						</tr>
+						{% for p in generador.sensoresP %}
+							{% if p['re_publica'] %}
+								<tr>
+									<th class="text-center">{{p['nombre']}}</th>
+									<td class="text-center">{{p['unidad']}}</td>
+									<td class="text-center">{{"C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+p['topico']}}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+						<tr>
+							<th class="text-center success">Actuadores</th>
+							<th class="text-center success">Tipo</th>
+							<th class="text-center success">Publicacion en Topico</th>
+						</tr>
+						{% for a in generador.actuadores %}
+							{% if a['re_publica'] %}
+								<tr>
+									<th class="text-center">{{a['nombre']}}</th>
+									<td class="text-center">{% if a['tipo'] == 'Ef' %} 0/1 {% else %} Numero {% endif %}</td>
+									<td class="text-center">{{"C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+a['topico']}}</td>
+								</tr>
+							{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>	
+			</div>
+
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <strong>Solicitar credenciales</strong></div>
+			<div class="panel-body">
+				<div id="msjSend"> </div>
+				<form class="form-horizontal" id="formMail">
+
+					<div class="form-group row">
+						<label class="col-md-4 control-label">Email</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+								<input type="email" class="form-control" id="email" name="email" placeholder="Correo electronico" required value="{{user.email}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Asunto</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="asunto" name ="asunto" placeholder="asunto">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group">
+                  		<div class="col-md-6 col-md-offset-4">
+                    		<button type="button" class="btn btn-primary" onclick="sendMail()">
+                        		<i class="fa fa-btn fa-sign-in"></i> Solicitar Acceso
+                        	</button>
+                    	</div>
+                	</div>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	
+function sendMail() {
+
+	$.ajax({
+			url: "/sendMail",
+		  	type: "POST",
+		  	data: $('#formMail').serialize(), 
+		  	success: function(data) {
+		  		$("#msjSend").html(data);
+		  		//location.reload();
+		  	}
+	  	});
+	//return false;
+
+}
+
+</script>

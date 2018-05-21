@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="row content">
+	<div class="col-md-6 col-md-offset-3">
+		 <div class="panel panel-default">
+		 	<div class="panel-heading">Registrarse</div>
+            <div class="panel-body">
+				<form class="form-horizontal" method="post">
+
+					<div class="form-group row">
+						<label class="col-md-4 control-label">Nombre</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="firtsname" name ="firtsname" aria-describedby="emailHelp" placeholder="Ingrese su nombre" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Apellido</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="lastname" name="lastname" placeholder="Ingrese su Apellido" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Nombre de Usuario</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+								<input type="text" class="form-control" id="username" name="username" placeholder="Ingrese un Username" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Email</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
+								<input type="email" class="form-control" id="email" name="email" placeholder="Correo electronico" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Password</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+								<input type="password" class="form-control" id="password" name="password" placeholder="contraseña" required>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Tipo de Usuario</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="tipo" name="tipo" class="form-control">
+        							<option value="user">Usuario</option>
+        							<option value="admin">Administrador</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+					<div class="form-group">
+                  		<div class="col-md-6 col-md-offset-5">
+                    		<button type="submit" class="btn btn-primary">
+                        		<i class="fa fa-btn fa-sign-in"></i> Registrarse
+                        	</button>
+                    	</div>
+                	</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

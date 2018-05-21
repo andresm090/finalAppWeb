@@ -1,0 +1,209 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.css">
+<div class="row content">
+	<div class="col-md-6 col-md-offset-3">
+		 <div class="panel panel-default">
+		 	<div class="panel-heading">Modificar Panel Fotovoltaico</div>
+            <div class="panel-body">
+				<form class="form-horizontal" method="post">
+
+					<span class="label label-default">Especificaciones tecnicas</span>
+				  	<hr>
+
+					<div class="form-group row">
+						<label class="col-md-4 control-label">Fabricante</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="fabricante" name ="fabricante" class="form-control">
+        							<option value="FIASA">FIASA</option>
+        							<option value="LV-Energy S.A.">LV-Energy S.A.</option>
+        							<option value="SOLARTEC S.A.">SOLARTEC S.A.</option>
+        							<option value="Tamesol">Tamesol</option>
+        							<option value="Hanover Solar">Hanover Solar</option>
+        							<option value="Soluxtec - Die Modulmanufaktur">Soluxtec - Die Modulmanufaktur</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Modelo - Serie</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="modelo" name="modelo" placeholder="Modelo o Serie del equipo" required value="{{generador.caracteristicas[0]['modelo-serie']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Potencia Maxima</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="pmax" name="pmax" placeholder="Potencia maxima (Watt)" required value="{{generador.caracteristicas[0]['potencia']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Corriente en Pmax</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="ipmax" name="ipmax" placeholder="Corriente en Pmax (Amp)" required value="{{generador.caracteristicas[0]['corriente-max']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Tensión en circuito abierto</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="voc" name="voc" placeholder="Tensión en circuito abierto (V)" required value="{{generador.caracteristicas[0]['voc']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Corriente de cortocircuito</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="isc" name="isc" placeholder="Corriente de cortocircuito (Amp)" required value="{{generador.caracteristicas[0]['isc']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Dimensiones (LxAxE) </label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="text" class="form-control" id="dimensiones" name="dimensiones" placeholder="Largo x Ancho x Espesor" required value="{{generador.caracteristicas[0]['dimensiones']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Peso</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="peso" name="peso" placeholder="Peso (Kgm)" value="{{generador.caracteristicas[0]['peso']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Cantidad de Celdas</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" step="any" class="form-control" id="celdas" name="celdas" placeholder="Cantidad de celdas" min="1" value="{{generador.caracteristicas[0]['cant-celdas']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Inclinación Actual</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="inclinacion" name="inclinacion" class="form-control">
+        							<option value="12">Verano (12°)</option>
+        							<option value="20">Primavera (20°)</option>
+        							<option value="40">Oto&ntildeo (40°)</option>
+        							<option value="60">Invierno (60°)</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Temperatura de Operación</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								</br>
+								<input id="tempOp" name="tempOp" type="text" class="span2" data-slider-min="-60" data-slider-max="100" data-slider-step="5" data-slider-value="[{{generador.caracteristicas[0]['temp-op']}}]"/><b> C° 100</b>
+							</div>
+						</div>
+				  	</div>
+
+				  	</br>
+				  	<span class="label label-default">Especificación del banco de baterias</span>
+				  	<hr>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Voltaje (Volt)</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="vol" name="vol" placeholder="voltaje" min="1" required value="{{generador.bbaterias[0]['voltaje']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Capacidad (Ah)</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="capacidad" name="capacidad" placeholder="Capacidad" min="1" required value="{{generador.bbaterias[0]['capacidad']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Cant. de baterias</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<input type="number" class="form-control" id="nbaterias" name="nbaterias" placeholder="Cantidad de baterias" min="1" required value="{{generador.bbaterias[0]['cant de baterias']}}">
+							</div>
+						</div>
+				  	</div>
+
+				  	<div class="form-group row">
+						<label class="col-md-4 control-label">Tipo de conexión</label>
+						<div class="col-md-6">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-pencil fa-fw"></i></span>
+								<select id="conexion" name="conexion" class="form-control">
+        							<option value="Serie">Serie</option>
+        							<option value="Paralelo">Paralelo</option>
+      							</select>
+							</div>
+						</div>
+				  	</div>
+
+					<div class="form-group">
+                  		<div class="col-md-6 col-md-offset-4">
+                    		<button type="submit" class="btn btn-primary">
+                        		<i class="fa fa-btn fa-sign-in"></i> Modificar Dispositivo
+                        	</button>
+                    	</div>
+                	</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.js"></script>
+<script>
+
+	$(document).ready(function(){
+		// Iniciamos el slider
+		$("#tempOp").slider({});
+		$('#fabricante').val("{{generador.caracteristicas[0]['fabricante']}}");
+		$('#conexion').val("{{generador.bbaterias[0]['conexion']}}");
+		$('#inclinacion').val("{{inc}}");
+		
+	});
+</script>
+
+{% endblock %}

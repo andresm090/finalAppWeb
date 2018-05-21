@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>IoT Aplication</title>
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:100,300,400,700">
+
+    <!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+	<link href="/public/stylesheets/submenu.css" rel="stylesheet">
+</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js" integrity="sha384-I6F5OKECLVtK/BL+8iSLDEHowSAfUo76ZL9+kGAgTRdiByINKJaqTPH/QVNS1VDb" crossorigin="anonymous"></script>
+<body id="app-layout">
+    <nav class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+
+                <!-- Collapsed Hamburger -->
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
+                    <span class="sr-only">Toggle Navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+
+                <!-- Branding Image -->
+                <a class="navbar-brand fuente" href="/">
+                    IoT Aplication
+                </a>
+
+            </div>
+
+            <div class="collapse navbar-collapse" id="app-navbar-collapse">
+            	{% if user %}
+	            	<ul class="nav navbar-nav fuente dropdown">
+	            		<li><a href="/comunas"><i class="fa fa-cog fa-map-marker fa-lg"></i> Mapa de Comunas</a>
+	                    <!--<li class="dropdown">
+	                    	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Comunas Rurales <b class="caret"></b></a>
+	                         <ul class="dropdown-menu">
+	                        	 Repetir de por cada comuna
+	                        	{% for comuna in comunas %}
+		                            <li class="dropdown dropdown-submenu"><a class="dropdown-toggle" data-toggle="dropdown">{{comuna.nombre}}</a>
+		                            	<ul class="dropdown-menu fuente">
+			                            		{% if user.suscripciones.indexOf('aerogenerador/clima') !== -1 or user.suscripciones.indexOf('aerogenerador/energia') !== -1 %}
+			                            			<li><a href="/aerogenerador/1">Aerpgenerador 1</a></li>
+			                            				
+			                            		{% endif %}
+
+			                            		{% if user.suscripciones.indexOf('fotovoltaica/clima') !== -1 or user.suscripciones.indexOf('fotovoltaica/energia') !== -1 %}
+			                            			<li><a href="#">Panel 1 </a></li>
+			                            		{% endif %}
+		                            	</ul>
+
+		                            </li>
+	                            {% endfor %}
+	                        </ul>-->
+	                    </li>
+	                </ul>
+	            {% endif %}
+
+
+                <!-- Right Side Of Navbar -->
+                <ul class="nav navbar-nav navbar-right fuente">
+                    <!-- Authentication Links -->
+                    {% if user %}
+	                    <li class="dropdown">
+	                    	<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"> {{user.username}} <span class="caret"></span>
+	                    	</a>
+	                    	<ul class="dropdown-menu fuente" role="menu">
+	                        	<li><a href="/topicos"><i class="fa fa-btn fa-check-circle-o fa-lg"></i> Mis suscripciones</a></li>
+	                        	<!--<li><a href="/prueba"><i class="fa fa-cog fa-spin fa-lg"></i> Ver Datos</a></li>
+	                        	<li><a href="/comunas"><i class="fa fa-cog fa-map-marker fa-lg"></i> Ver Mapa</a></li>-->
+	                        	{% if user.isAdministrador() %}
+	                        		<li><a href="/admin"><i class="fa fa-cog fa-spin fa-lg"></i> Administrador</a></li>
+	                        	{% endif %}
+	                        	<li><a href="/logout"><i class="fa fa-btn fa-sign-out fa-lg"></i> Logout</a></li>
+	                        </ul>
+	                    </li>
+                    {% else %}
+                    	<li><a href="/login">Identificarse</a></li>
+                        <li><a href="/signup">Registrarse</a></li>
+                   {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+		{% block content %}
+
+	    {% endblock %}
+
+	</div>
+
+    <!-- JavaScripts -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="/public/javascripts/submenu.js"></script>
+
+</body>
+</html>

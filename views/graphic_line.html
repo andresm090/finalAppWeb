@@ -1,0 +1,27 @@
+{% extends 'graphic_base.html' %}
+
+{% block content %}
+	<script>
+		var grafico1 = Highcharts.chart('{{conf['id']}}', {{JSON.stringify(conf['grafico'])}},);
+		point = grafico1.title;
+		point.update({text: '{{conf['titulo']}}'});
+		point = grafico1.yAxis[0];
+		point.update({title: { text: '{{conf['unidad']}}'}});
+		//point = grafico1.plotOptions;
+		//point.update({ series: { pointStart: {{fecha}}, pointInterval: 36e5}});
+		point = grafico1.series[0];
+		point.update({data: [
+			{% for v in valores %}
+				[{{v.valor/1000}}, Date.UTC({{v.producedAt.getFullYear()}}, {{v.producedAt.getMonth()}}, {{v.producedAt.getDate()}}, {{v.producedAt.getHours()}}, {{v.producedAt.getMinutes()}}, {{v.producedAt.getSeconds()}})],
+			{% endfor %}
+			],
+			//pointInterval: {{media}},
+			name: '{{conf['titulo']}}',
+			tooltip: {
+	            valueSuffix: ' {{conf['unidad']}}'
+	        }
+		});
+
+	</script>	
+
+{% endblock %}

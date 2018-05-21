@@ -1,0 +1,20 @@
+
+
+<div class="row">		
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel {{conf['panel']}}">
+			<div class="panel-heading">{{conf['titulo']}} <a class="pull-right glyphicon glyphicon-triangle-bottom" data-toggle="collapse" href="#{{conf['collapse']}}"></a></div>
+			<div id="{{conf['collapse']}}" class="panel-collapse collapse in">
+				<div class="panel-body">
+					<div class="col-md-12 col-md-offset-0">
+						<div id="{{conf['id']}}" style="min-width: 300px; max-width: 800px; height: 300px; margin: 0 auto"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% block content %}
+
+{% endblock %}

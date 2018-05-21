@@ -1,0 +1,40 @@
+extends layout
+
+block content
+  h1= title
+  div#table_div
+  p Prueba del #{title} #{cuenta}
+  script(src='http://localhost:3300/socket.io/socket.io.js')
+  script(type='text/javascript' src='https://www.gstatic.com/charts/loader.js')
+  style.
+   .google-visualization-table-td {
+    text-align: center;}
+  script. 
+   var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+   google.charts.load('current', {'packages':['table']});
+   google.charts.setOnLoadCallback(drawTable);
+   var aux;
+   var tab;
+   
+   socket.on('notification', setData);
+   
+   
+   function drawTable(){
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topico');
+    data.addColumn('string', 'Mensaje');
+    aux = data;
+
+    var table = new google.visualization.Table(document.getElementById('table_div'));
+    tab = table;
+    table.draw(data, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});}
+
+   function setData(msj){
+    //console.log(msj);
+    var data = msj.split("-");
+    aux.addRows([
+     [data[1], data[0]]
+    ]);
+    tab.draw(aux, {showRowNumber: true, width: '100%', height: '100%'});
+   }
+  

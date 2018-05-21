@@ -1,0 +1,197 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-default">		
+			<div class="panel-body">
+				{% if success != "" %}
+					<div class="alert alert-success alert-dismissible" role="alert">
+	  					<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	  					<strong>{{success}}</strong>
+					</div> 
+				{% endif %}
+				<div class="col-md-12 col-md-offset-0">
+					<div class="pull-right">
+						<button type="button" class="btn btn-primary" onclick="newComuna()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+					
+						<button type="button" class="btn btn-danger" onclick="deleteComunaConfirm()" id="btnDelete" disabled><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+					</div>
+				</div>
+				
+				{% include 'table_control.html' %}
+
+			</div>
+		</div>	
+	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalChoiceGenerator">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        		<h4 class="modal-title">Seleccione el dispositivo a incorporar</h4>
+      		</div>
+	      	<div class="modal-body">
+	      		<div class="panel panel-default">		
+					<div class="panel-body">
+	      				<div class="col-md-8 col-md-offset-2">
+				        	<button type="button" class="btn btn-primary btn-lg btn-block" onclick="newAerogenerador()">Aerogenerador de baja potencia</button>
+								
+							<button type="button" class="btn btn-warning btn-lg btn-block" onclick="newPanelFoto()">Panel fotovoltaico</button>
+
+							<button type="button" class="btn btn-danger btn-lg btn-block" disabled>Panel solar</button>
+						</div>
+		      		</div>
+		      	</div>
+			</div>
+	    	<div class="modal-footer">
+	        	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      	</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDelete">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        		<h4 class="modal-title">Confirmar operación</h4>
+      		</div>
+	      	<div class="modal-body">
+	      		<div class="panel panel-default">		
+					<div class="panel-body">
+						<div id="texto"> </div>
+		      		</div>
+		      	</div>
+			</div>
+	    	<div class="modal-footer">
+	        	<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+	        	<button type="button" class="btn btn-primary" onclick="deleteComuna()">Aceptar</button>
+	      	</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="modalDetalle">
+	<div id="cuerpoModalDetalle"> </div>
+</div>
+
+<script>
+
+	$(document).ready(function(){
+
+		$('input[type=checkbox]').on('change', function() {
+			if ($('input[type=checkbox]:checked').length > 0) {
+				$("#btnDelete").removeAttr("disabled");
+			} else {
+				$("#btnDelete").attr("disabled", "disabled");
+			}
+		});
+	});
+
+	var listcomuna;
+	var comunaselect;
+
+	function showModealChoiceGenerator(id){
+		$('#modalChoiceGenerator').modal('show');
+		comunaselect = id;
+	};
+
+	function newComuna(){
+		location.href = "/admin/nuevaComuna";
+	};
+
+	function newAerogenerador(){
+		location.href = "/admin/" + comunaselect +"/nuevoaerogenerador";
+	};
+
+	function newPanelFoto(){
+		location.href = "/admin/" + comunaselect +"/nuevopanelfotovoltaico";
+	};
+
+	function deleteComunaConfirm(){
+		listcomuna = [];
+		var text = "<h4 id=\"texto\"> Esta seguro que desea eliminar las comunas seleccionadas: <br />";
+		$("input:checkbox:checked").each(function() {
+			text = text + "	*" + $(this).attr('name') + "<br />";
+			listcomuna.push($(this).attr('id'));
+        });
+        text += "</h4>"; 
+        $("#texto").replaceWith(text);
+        $('#modalDelete').modal('show');
+
+	};
+
+	function deleteComuna(){
+
+		$.ajax({
+	  		url: "/admin/delComuna",
+	  		type: "POST",
+	  		data: {listcomuna: listcomuna},
+	  		success: function(data) {
+	  			location.reload();
+	  		}
+  		});
+
+	};
+
+	function activarComuna(id){
+
+		$.ajax({
+	  		url: "/admin/activarComuna",
+	  		type: "POST",
+	  		data: {idcomuna: id},
+	  		success: function(data) {
+	  			location.reload();
+	  		}
+  		});
+	};
+
+	function deleteComunaByID(id){
+
+		$.ajax({
+	  		url: "/admin/delComunaByID",
+	  		type: "POST",
+	  		data: {idcomuna: id},
+	  		success: function(data) {
+	  			location.reload();
+	  		}
+  		});
+	};
+
+	function modifyComuna(id){
+		location.href = "/admin/" + id +"/modificar";
+	};
+
+	function getDetalle(id){
+
+		$.ajax({
+	  		url: "/admin/getDetalle",
+	  		type: "POST",
+	  		data: {idcomuna: id},
+	  		success: function(data) {
+	  			$('#cuerpoModalDetalle').html(data);
+	  		}
+  		});
+
+  		$.ajax({
+	  		url: "/admin/getDetalleGeneradores",
+	  		type: "POST",
+	  		data: {idcomuna: id},
+	  		success: function(data) {
+	  			$('#tableGeneradores').html(data);
+	  		}
+  		});
+
+  		$('#modalDetalle').modal('show');
+	};
+
+
+</script>
+
+{% endblock %}

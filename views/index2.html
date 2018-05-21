@@ -1,0 +1,29 @@
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
+<script src="//cdn.jsdelivr.net/justgage/1.0.1/justgage.min.js"></script>
+ 
+<script>
+  var socket = io();
+  socket.on('notification', function(msg){
+          alert("hola");
+  });
+ 
+ 
+        var gTemperatura = new JustGage({
+            id: "gaugeTemperatura",
+            value: 0,
+            min: 10,
+            max: 30,
+            title: "Temperatura ºC"
+        });
+ 
+        var gConsumo = new JustGage({
+            id: "gaugeConsumo",
+            value: 0,
+            min: 0,
+            max: 3000,
+            title: "Consumo Wh"
+        });
+ 
+</script>

@@ -1,0 +1,53 @@
+				<div class="col-md-12 col-md-offset-0">
+					</br>
+					<table class="table table-bordered table-striped">
+						<thead class="inverse">
+						    <tr>
+						    	<th></th>
+								<th>#</th>
+								<th>Nombre</th>
+								<th>Localidad</th>
+								<th>Departamento</th>
+								<th>Encargado</th>
+								<th>Población</th>
+								<th>Aciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for comuna in comunas %}
+								<tr>
+									<th> <input class="form-check-input" type="checkbox" id={{comuna.id}} name="{{comuna.nombre}}"></input></th>
+									<th scope="row">{{loop.index}}</th>
+									<td>{{comuna.nombre}}</td>
+									<td>{{comuna.localidad}}</td>
+									<td>{{comuna.departamento}}</td>
+									<td>{{comuna.encargado}}</td>
+									<td>{{comuna.poblacion}}</td>
+									<td>
+										<div class="btn-group">
+										<button type="button" class="btn {% if comuna.activo %}btn-success {% else %} btn-danger {% endif %}">Acciones</button>
+										<button type="button" class="btn {% if comuna.activo %}btn-success {% else %} btn-danger {% endif %} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    										<span class="caret"></span>
+    										<span class="sr-only">Toggle Dropdown</span>
+  										</button>
+  										{% if comuna.activo %}
+											<ul class="dropdown-menu">
+												<li><a href="#" onclick="modifyComuna(&quot;{{comuna.id}}&quot;)">Modificar</a></li>
+												<li><a href="#" onclick="deleteComunaByID(&quot;{{comuna.id}}&quot;)">Eliminar</a></li>
+												<li><a href="#" onclick="getDetalle(&quot;{{comuna.id}}&quot;)">Ver Detalle</a></li>
+												<li role="separator" class="divider"></li>
+												<li><a href="#" onclick="showModealChoiceGenerator(&quot;{{comuna.id}}&quot;)">Agregar Equipo Generador</a></li>
+											</ul>
+										{% else %}
+											<ul class="dropdown-menu">
+												<li><a href="#" onclick="activarComuna(&quot;{{comuna.id}}&quot;)">Activar</a></li>
+												<li><a href="#">Ver Detalle</a></li>
+											</ul>
+										{% endif %}
+										</div>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>	
+				</div>

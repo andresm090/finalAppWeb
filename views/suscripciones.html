@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row content">
+	<div class="col-md-8 col-md-offset-2">
+	  <div class="panel panel-default">
+		<div class="panel-heading">Suscripciones</div>
+		<div class="panel-body">
+			<form method="post">
+				<div class="table-responsive">
+					<table class="table text-center table-striped table-bordered">
+						<thead class="thead-dark">
+							<tr>
+						  		<th scope="col" class="text-center">Topico</th>
+						  		<th scope="col" class="text-center">Seleccionar</th>
+							</tr>
+					  	</thead>
+						<tbody>
+							{% for topico in topicos %}
+						  		<tr>
+									<td>{{loop.key}}</td>
+									<td><input class="form-check-input" type="checkbox" id={{loop.key}} name={{loop.key}} {% if topico %} checked {% endif %}></td>
+						  		</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="form-group">
+                  	<div class="col-md-6 col-md-offset-5">
+                    	<button type="submit" class="btn btn-primary">
+                       		<i class="fa fa-btn fa-pencil"></i> Suscribir
+                       	</button>
+                   	</div>
+                </div>
+		  	</form>
+		</div>
+	  </div>
+	</div>
+ </div>
+
+{% endblock %}

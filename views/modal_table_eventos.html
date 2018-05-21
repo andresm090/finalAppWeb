@@ -1,0 +1,31 @@
+<div class="panel panel-default">
+	<div class="panel-heading"><span class="glyphicon glyphicon-bell" aria-hidden="true"></span> <strong>Ultimos ({{eventos.length}}) eventos registrados</strong></div>
+	<div class="panel-body">
+		<table class="table table-bordered table-striped">
+			<thead class="inverse">
+			    <tr>
+					<th class="text-center">#</th>
+					<th class="text-center">Evento</th>
+					<th class="text-center">Producido</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for evento in eventos %}
+					<tr>
+						<th class="text-center" scope="row">{{loop.index}}</th>
+						{% if evento.topico.indexOf("Ei") > -1 %}
+							<td class="text-center">Ajuste de inclinación del panel - {{evento.valor}}°</td>
+						{% else %}
+							{% if evento.valor == 1 %}
+								<td class="text-center">Freno de corriente parasitas activado</td>
+							{% else %}
+								<td class="text-center">Freno de corriente parasitas desacoplado</td>
+							{% endif %}	
+						{% endif %}
+						<td class="text-center">{{evento.producedAt.toLocaleString('en-us', options)}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>	
+	</div>
+</div>

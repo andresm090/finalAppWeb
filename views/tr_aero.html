@@ -1,0 +1,104 @@
+<div class="row">		
+	<div class="col-md-6 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading">Velocidad de viento</div>
+			<div class="panel-body">
+				<div id="container2" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+				<div id="table_div2"> </div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading">Temperatura</div>
+			<div class="panel-body">
+				<div id="container" style="min-width: 270px; max-width: 360px; height: 260px; margin: 0 auto"></div>
+				<div id="table_div"> </div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<div class="row">
+	<div class="col-md-12 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading">Energia</div>
+			<div class="panel-body">
+				<div id="container3" style="width: 80%; height: 85%; margin: 0 auto"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+var chart = Highcharts.chart('container', {{JSON.stringify(gaugeTemp)}},);
+var chart2 = Highcharts.chart('container2', {{JSON.stringify(gaugeVel)}},);
+var volyAmp = Highcharts.chart('container3', {{JSON.stringify(gaugeVA)}},);
+
+  var socket = io.connect('http://localhost:3300', { 'forceNew': true });
+  google.charts.load('current', {'packages':['table']});
+   google.charts.setOnLoadCallback(drawTable);
+   var aux;
+   var tab;
+   var tab2;
+   
+   socket.on('notification', setData);
+   
+   
+   function drawTable(){
+	var data = new google.visualization.DataTable();
+	var data2 = new google.visualization.DataTable();
+	data.addColumn('string', 'Topico');
+	data.addColumn('string', 'Mensaje');
+
+	data2.addColumn('string', 'Velocidad');
+	data2.addColumn('string', 'Unidad');
+
+	aux = data;
+
+	var table = new google.visualization.Table(document.getElementById('table_div'));
+	var table2 = new google.visualization.Table(document.getElementById('table_div2'));
+	tab = table;
+	tab2 = table2;
+	table.draw(data, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+	table2.draw(data2, {showRowNumber: true, width: '100%', height: '100%', alternatingRowStyle: true});
+
+	}
+
+   function setData(msj){
+   	var datatab = new google.visualization.DataTable();
+   	datatab.addColumn('number', 'Velocidad');
+	datatab.addColumn('string', 'Unidad');
+	//console.log(msj);
+	var data = msj.split("-");
+	aux.addRows([
+	 [data[2], data[0]]
+	]);
+	datatab.addRows([
+	 [parseInt(data[1]), "m/s"],
+	 [Math.round(parseInt(data[1]) * 3.6), "km/h"]
+	]);
+
+	tab.draw(aux, {showRowNumber: true, width: '100%', height: '100%'});
+	tab2.draw(datatab, {showRowNumber: true, width: '100%', height: '100%'});
+	if (data[2] == "aerogenerador/clima"){
+	  var temperatura = parseInt(data[0]);
+	  var velocidad = parseInt(data[1]);
+	}
+	var point = chart.series[0].points[0];
+	var point2 = chart2.series[0];
+	point.update(temperatura);
+	point2.update({dataLabels: { formatter: function () {
+                								var ms = velocidad,
+                    								kmh = Math.round(ms * 3.6);
+                								return '<span style="color:#339">' + ms + ' m/s</span><br/>' +
+                    									'<span style="color:#933">' + kmh + ' Km/h</span>';
+            								}
+                  				}
+              	});
+	point2.points[0].update(velocidad);
+}
+</script>

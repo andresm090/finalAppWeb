@@ -1,0 +1,125 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<!--<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>-->
+
+<script src="/public/javascripts/highcharts.js"></script>
+<script src="/public/javascripts/highcharts-more.js"></script>
+<script src="/public/javascripts/exporting.js"></script>
+<script src="/public/javascripts/solid-gauge.js"></script>
+
+<script src="http://localhost:3300/socket.io/socket.io.js"></script>
+<script src="/public/javascripts/loader.js"></script>
+
+<style type="text/css">
+	.google-visualization-table-td {
+		text-align: center;}
+	.google-visualization-table-type-number.google-visualization-table-td{
+		text-align: center;}
+	.google-visualization-table-th {
+		text-align: center;}
+</style>
+<link href="/public/stylesheets/appIoT.css" rel="stylesheet">
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">{{titulo}}</div>
+			<div id="msj"> </div>
+			<div class="panel-body">
+				<ul class="nav nav-tabs">
+					<li role="presentation" name="liCT" id="liCT"><a name="tabtec" id="tabtec">Carac. Tecnicas</a></li>
+					<li role="presentation" name="liTR" id="liTR"><a name="tabtr" id="tabtr">Tiempo Real</a></li>
+					<li role="presentation" name="liH" id="liH"><a name="tabh" id="tabh">Historicos</a></li>
+					<li role="presentation" name="liP" id="liP"><a name="tabp" id="tabp">Solicitar Datos</a></li>
+				</ul> 
+				<div id="data">
+
+				</div>
+			</div>
+		</div>	
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(){
+
+		$("#liCT").addClass("active");
+		$.ajax({
+			url: "/getDataC/" + '{{id}}',
+		  	type: "GET",
+		  	success: function(data) {
+		  		$("#data").html(data);
+		  	}
+	  	});
+
+
+		$("#tabtec").click(function(){
+			$("#liCT").addClass("active");
+			$("#liTR").removeClass("active");
+			$("#liH").removeClass("active");
+			$("#liP").removeClass("active");
+
+			$.ajax({
+				url: "/getDataC/" + '{{id}}',
+		  		type: "GET",
+		  		success: function(data) {
+		  			$("#data").html(data);
+		  		}
+	  		});
+		});
+
+		$("#tabtr").click(function(){
+			$("#liTR").addClass("active");
+			$("#liCT").removeClass("active");
+			$("#liH").removeClass("active");
+			$("#liP").removeClass("active");
+
+			$.ajax({
+		  		url: "/getDataTR2/" + '{{id}}',
+		  		type: "GET",
+		  		success: function(data) {
+		  			$("#data").html(data);
+		  		}
+	  		});
+
+		});
+
+		$("#tabh").click(function(){
+			$("#liH").addClass("active");
+			$("#liTR").removeClass("active");
+			$("#liCT").removeClass("active");
+			$("#liP").removeClass("active");
+
+			$.ajax({
+		  		url: "/getDataH/" + '{{id}}',
+		  		type: "GET",
+		  		success: function(data) {
+		  			$("#data").html(data);
+		  		}
+	  		});
+		});
+
+		$("#tabp").click(function(){
+			$("#liP").addClass("active");
+			$("#liTR").removeClass("active");
+			$("#liCT").removeClass("active");
+			$("#liH").removeClass("active");
+
+			$.ajax({
+		  		url: "/getDataP/" + '{{id}}',
+		  		type: "GET",
+		  		success: function(data) {
+		  			$("#data").html(data);
+		  		}
+	  		});
+		});
+
+	});
+
+</script>
+
+{% endblock %}

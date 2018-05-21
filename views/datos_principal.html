@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<script src="http://localhost:3300/socket.io/socket.io.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<style type="text/css">
+  .google-visualization-table-td {
+	text-align: center;}
+</style>
+
+<div class="row">
+
+	<div class="col-md-3 col-md-offset-0">
+		<div class="panel panel-default">
+			<div class="panel-heading">Topicos</div>
+			<div class="panel-body">
+				<a onclick="mostrarTabAero()" class="btn btn-info btn-lg btn-block">Aerogeneradores</a>
+                <a onclick="mostrarTabPanel()" class="btn btn-default btn-lg btn-block">Paneles</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-heading">Informacion</div>
+			<div class="panel-body" id="panelAero">
+			</div>
+			
+		</div>
+	</div>	
+</div>
+
+<script>
+	function mostrarTabAero(){
+		$.ajax({
+  		url: "/getPanelAero",
+  		type: "GET",
+  		success: function(data) {
+  				$("#panelAero").html(data);
+  			}
+  		});
+
+	}
+
+	function mostrarTabPanel(){
+		alert("Tab del Panel");
+	}
+
+
+</script>
+
+{% endblock %}
