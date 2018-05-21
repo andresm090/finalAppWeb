@@ -91,7 +91,7 @@ serverMQTT.connect(function(clientMQTT) {
 		repository.procesarTopico(topic, function(generador, tipo, variable){
 			switch(tipo) {
 				case "P":
-					repository.saveDataPotencias(value.toString(), generador, topic, function(v, a, w, err){
+					repository.saveDataPotencias(value.toString(), generador, topic, variable, function(v, a, w, err){
 						if (err) {
 							console.log("Ocurrio un problema en el resguardo ");
 						}
@@ -100,15 +100,14 @@ serverMQTT.connect(function(clientMQTT) {
 							tmpSocket.emit(generador.id+'/p', v, a, w);
 						});
 
-						if (generador.sensoresP[0]['re_publica']){
+						if (generador.sensoresP[0]['re_publica'] && (v != null)){
 							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.sensoresP[0]['topico'], v.toString());
 						}
-						if (generador.sensoresP[1]['re_publica']){
+						if (generador.sensoresP[1]['re_publica'] && (w != null)){
 							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.sensoresP[1]['topico'], w.toString());
 						}
-						if (generador.sensoresP[2]['re_publica']){
-							var consumo = v*a;
-							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.sensoresP[2]['topico'], consumo.toString());
+						if (generador.sensoresP[2]['re_publica'] && (a != null)){
+							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.sensoresP[2]['topico'], a.toString());
 						}
 
 					});
@@ -153,21 +152,20 @@ serverMQTT.connect(function(clientMQTT) {
 					break;
 				default:
 					repository.saveEvento(value, generador, topic);
+					var valor;
 					if (tipo == "Ef"){
 						//Notifico a los clientes
 						connectionsArray.forEach(function(tmpSocket) {
 							tmpSocket.emit('mapComuna/e', Number(value), generador.comuna.id);
 							tmpSocket.emit(generador.id+'/e', Number(value));
 						});
-						if (generador.actuadores[0]['re_publica']){
-							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.actuadores[0]['topico'], value);
-						}
+						valor = value;
 					}
 					if (tipo == "Ei") {
 						//Notifico a los clientes
 						connectionsArray.forEach(function(tmpSocket) {
 							tmpSocket.emit('mapComuna/i', generador.comuna.id, generador.id);
-							var inc = Number(value)
+							var inc = Number(value);
 							switch(inc) {
 								case 60:
 									tmpSocket.emit(generador.id+'/e', gaugeIncSeries.invierno, inc);
@@ -182,10 +180,12 @@ serverMQTT.connect(function(clientMQTT) {
 									tmpSocket.emit(generador.id+'/e', gaugeIncSeries.otonio, inc);
 							}
 						});
-						
-						if (generador.actuadores[0]['re_publica']){
-							clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.actuadores[0]['topico'], value + "°");
-						}
+
+						valor = value + "°";
+					}
+
+					if (generador.actuadores[0]['re_publica']){
+						clientMQTT.publish("C"+generador.comuna.id_topic+"/"+generador.sufijo+generador.id_topic+"/"+generador.actuadores[0]['topico'], value);
 					}
 					break;
 			}

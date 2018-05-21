@@ -84,37 +84,44 @@ var repository = function () {
 		}
 	};
 
-	this.saveDataPotencias = function (value, generador, topic, cb){
+	this.saveDataPotencias = function (value, generador, topic, variable, cb){
 
-		//V-A-W
-		var data = value.split("-");
-		var listdata = [];
+		var data;
+		var v = null;
+		var a = null;
+		var potencia = null;
 		var errores = false;
 
-		listdata.push({valor: Number(data[0]), unidad: generador.sensoresP[0]['unidad'], tipo: generador.sensoresP[0]['sufijo']});
-		listdata.push({valor: Number(data[1]), unidad: generador.sensoresP[2]['unidad'], tipo: generador.sensoresP[2]['sufijo']});
-		listdata.push({valor: Number(data[2]), unidad: generador.sensoresP[1]['unidad'], tipo: generador.sensoresP[1]['sufijo']});
-
-		for (i = 0; i < listdata.length; i++){
-
-			var dato = new Dato({
-				valor: listdata[i]['valor'],
-				unidad: listdata[i]['unidad'],
-				topico: topic,
-				producedAt: new Date(),
-				generador: generador.id,
-				tipo: listdata[i]['tipo'],
-				TAG: generador.getTagPotencia(),
-			});
-
-			dato.save((err) => {
-				if (err){
-					errores = true;
-				}
-			});
+		if (variable == "Vbb"){
+			data = {valor: Number(value), unidad: generador.sensoresP[0]['unidad'], tipo: generador.sensoresP[0]['sufijo']};
+			v = Number(value);
+		}
+		if (variable == "Ac"){
+			data = {valor: Number(value), unidad: generador.sensoresP[2]['unidad'], tipo: generador.sensoresP[2]['sufijo']};
+			a = Number(value);
+		}
+		if (variable == "Pg"){
+			data = {valor: Number(value), unidad: generador.sensoresP[1]['unidad'], tipo: generador.sensoresP[1]['sufijo']};
+			potencia = Number(value);	
 		}
 
-		cb(Number(data[0]), Number(data[1]), Number(data[2]), errores);
+		var dato = new Dato({
+			valor: data['valor'],
+			unidad: data['unidad'],
+			topico: topic,
+			producedAt: new Date(),
+			generador: generador.id,
+			tipo: data['tipo'],
+			TAG: generador.getTagPotencia(),
+		});
+
+		dato.save((err) => {
+			if (err){
+				errores = true;
+			}
+		});
+
+		cb(v, a, potencia, errores);
 
 	};
 
