@@ -75,3 +75,8 @@ Algunas aplicaciones útiles para probar la aplicación:
 Cada sensor (real o simulado) debe publicar en el topico correspondiente.
 
 El mapa web esta preparado para la visualizacion de puntos geograficos dentro de la provincia del Chubut.
+
+## Integrantes
+
+- Martinovic Andres.
+- Etchart Walter.
