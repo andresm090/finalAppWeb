@@ -53,3 +53,25 @@ Para iniciar el servidor utilizar el siguiente comando.
 ```sh
 $ npm start
 ```
+
+## Acceder al sistema
+
+Para ingresar al sistema acceder a la siguiente url [http://localhost:3000/](http://localhost:3000/).
+
+**Nota:** El sistema maneja 2 tipos de perfiles, usuarios administradores y usuarios estandar. Para poder visualizar los gauges de los sensores, es necesario dar de alta los puntos de toma de datos (Comunas) y los equipos generadores de dichos puntos. Para ello es necesario contar con una cuenta administrador. 
+A partir de ahí, cualquier tipo de usuario, puede ubicar los puntos en el mapa web a traves de la opción [Mapa de Comunas](http://localhost:3000/comunas) ubicada en la barra de navegación y acceder a los distintos dispositivos de generación y por ende a los sensores instalados en ellos. 
+Tener en cuenta que, de acuerdo a las suscripciones que posea cada usuario, los gauges a visualizar varian. Estos varian de acuerdo al tipo de equipo generador y al tipo de variables de interes (cliamticas o energeticas). Para suscribirse a estos topicos, se debe desplegar el menu de usuario y acceder a la opcion de [Mis suscripciones](http://localhost:3000/topicos).
+
+    
+## Consideraciones Finales
+
+Para los publicadores es posible utilizar sensores IoT que publiquen sus valores por Internet, sensores conectados a placas que permitan transmitir los valores recolectados o simularlos por medio de aplicaciones que permitan la publicación de datos por medio del protocolo MQTT.
+
+Algunas aplicaciones útiles para probar la aplicación:
+
+- [MyMQTT](https://play.google.com/store/apps/details?id=at.tripwire.mqtt.client&hl=es_AR) 
+- [MQTT Dash](https://play.google.com/store/apps/details?id=net.routix.mqttdash&hl=es_AR)
+
+Cada sensor (real o simulado) debe publicar en el topico correspondiente.
+
+El mapa web esta preparado para la visualizacion de puntos geograficos dentro de la provincia del Chubut.

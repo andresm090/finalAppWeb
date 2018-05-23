@@ -86,7 +86,7 @@ var repository = function () {
 
 	this.saveDataPotencias = function (value, generador, topic, variable, cb){
 
-		var data;
+		var data = null;
 		var v = null;
 		var a = null;
 		var potencia = null;
@@ -104,22 +104,24 @@ var repository = function () {
 			data = {valor: Number(value), unidad: generador.sensoresP[1]['unidad'], tipo: generador.sensoresP[1]['sufijo']};
 			potencia = Number(value);	
 		}
+		if (data != null) {
 
-		var dato = new Dato({
-			valor: data['valor'],
-			unidad: data['unidad'],
-			topico: topic,
-			producedAt: new Date(),
-			generador: generador.id,
-			tipo: data['tipo'],
-			TAG: generador.getTagPotencia(),
-		});
+			var dato = new Dato({
+				valor: data['valor'],
+				unidad: data['unidad'],
+				topico: topic,
+				producedAt: new Date(),
+				generador: generador.id,
+				tipo: data['tipo'],
+				TAG: generador.getTagPotencia(),
+			});
 
-		dato.save((err) => {
-			if (err){
-				errores = true;
-			}
-		});
+			dato.save((err) => {
+				if (err){
+					errores = true;
+				}
+			});
+		}
 
 		cb(v, a, potencia, errores);
 
@@ -136,7 +138,7 @@ var repository = function () {
 
 	this.saveDataCLimaAero = function (value, generador, topic, variable, cb){
 
-		var data;
+		var data = null;
 		var vel = null;
 		var dir = null;
 		var sector = "";
@@ -157,24 +159,25 @@ var repository = function () {
 		if (variable == "T") {
 			data = {valor:Number(value), unidad: generador.sensoresC[2]['unidad'], tipo: generador.sensoresC[2]['sufijo']};
 			temp = Number(value);
-
 		}
-		
-		var dato = new Dato({
-			valor: data['valor'],
-			unidad: data['unidad'],
-			topico: topic,
-			producedAt: new Date(),
-			generador: generador.id,
-			tipo: data['tipo'],
-			TAG: generador.getTagClima(),
-		});
+		if (data != null) {
 
-		dato.save((err) => {
-			if (err){
-				errores = true;
-			}
-		});
+			var dato = new Dato({
+				valor: data['valor'],
+				unidad: data['unidad'],
+				topico: topic,
+				producedAt: new Date(),
+				generador: generador.id,
+				tipo: data['tipo'],
+				TAG: generador.getTagClima(),
+			});
+
+			dato.save((err) => {
+				if (err){
+					errores = true;
+				}
+			});
+		}
 
 		cb(temp, vel, dir, sector, errores);
 	};
@@ -182,7 +185,7 @@ var repository = function () {
 	this.saveDataCLimaPanelF = function (value, generador, topic, variable, cb){
 
 		var errores = false;
-		var data;
+		var data = null;
 		var rad = null;
 		var temp = null;
 
@@ -194,23 +197,24 @@ var repository = function () {
 			data = {valor:Number(value), unidad: generador.sensoresC[1]['unidad'], tipo: generador.sensoresC[1]['sufijo']};
 			temp = Number(value);
 		}
-		
+		if (data != null) {
 
-		var dato = new Dato({
-			valor: data['valor'],
-			unidad: data['unidad'],
-			topico: topic,
-			producedAt: new Date(),
-			generador: generador.id,
-			tipo: data['tipo'],
-			TAG: generador.getTagClima(),
-		});
+			var dato = new Dato({
+				valor: data['valor'],
+				unidad: data['unidad'],
+				topico: topic,
+				producedAt: new Date(),
+				generador: generador.id,
+				tipo: data['tipo'],
+				TAG: generador.getTagClima(),
+			});
 
-		dato.save((err) => {
-			if (err){
-				errores = true;
-			}
-		});
+			dato.save((err) => {
+				if (err){
+					errores = true;
+				}
+			});
+		}
 		
 		cb(temp, rad, errores);
 	};
